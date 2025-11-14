@@ -15,7 +15,7 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "/app.py"
+      "dest": "/api/index.py"
     },
     {
       "src": "/(.*)",
@@ -26,7 +26,7 @@
     "FLASK_ENV": "production"
   },
   "functions": {
-    "app.py": {
+    "api/index.py": {
       "maxDuration": 10
     }
   }
