@@ -1,6 +1,9 @@
 // Configuración de la API
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:5000/api',
+    // Detecta automáticamente si está en desarrollo o producción
+    BASE_URL: window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000/api' 
+        : `${window.location.origin}/api`,
     TIMEOUT: 10000,
     HEADERS: {
         'Content-Type': 'application/json'
