@@ -3,15 +3,28 @@ const API_CONFIG = {
     // Detecta automáticamente si está en desarrollo o producción
     BASE_URL: (function() {
         const hostname = window.location.hostname;
-        console.log('Hostname detected:', hostname);
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+        const isVercel = hostname.includes('vercel.app');
         
-        if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            console.log('Using localhost API');
-            return 'http://localhost:5000/api';
+        console.log('=== API CONFIG DEBUG ===');
+        console.log('Hostname:', hostname);
+        console.log('Is Local:', isLocal);
+        console.log('Is Vercel:', isVercel);
+        console.log('Origin:', window.location.origin);
+        
+        let baseUrl;
+        if (isLocal) {
+            baseUrl = 'http://localhost:5000/api';
+            console.log('✅ Using localhost API');
         } else {
-            console.log('Using production API:', `${window.location.origin}/api`);
-            return `${window.location.origin}/api`;
+            baseUrl = `${window.location.origin}/api`;
+            console.log('✅ Using production API');
         }
+        
+        console.log('Final API URL:', baseUrl);
+        console.log('========================');
+        
+        return baseUrl;
     })(),
     TIMEOUT: 10000,
     HEADERS: {
