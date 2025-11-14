@@ -1,9 +1,18 @@
 // Configuración de la API
 const API_CONFIG = {
     // Detecta automáticamente si está en desarrollo o producción
-    BASE_URL: window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000/api' 
-        : `${window.location.origin}/api`,
+    BASE_URL: (function() {
+        const hostname = window.location.hostname;
+        console.log('Hostname detected:', hostname);
+        
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            console.log('Using localhost API');
+            return 'http://localhost:5000/api';
+        } else {
+            console.log('Using production API:', `${window.location.origin}/api`);
+            return `${window.location.origin}/api`;
+        }
+    })(),
     TIMEOUT: 10000,
     HEADERS: {
         'Content-Type': 'application/json'
@@ -19,6 +28,8 @@ class APIClient {
 
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
+        console.log('Making request to:', url);
+        
         const config = {
             headers: this.headers,
             ...options
