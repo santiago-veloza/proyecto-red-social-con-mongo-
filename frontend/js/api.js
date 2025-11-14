@@ -1,24 +1,26 @@
 // Configuración de la API
 const API_CONFIG = {
-    // Detecta automáticamente si está en desarrollo o producción
+    // FORZAR producción - siempre usar la URL actual del navegador
     BASE_URL: (function() {
         const hostname = window.location.hostname;
-        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
-        const isVercel = hostname.includes('vercel.app');
+        const protocol = window.location.protocol;
+        const origin = window.location.origin;
         
         console.log('=== API CONFIG DEBUG ===');
         console.log('Hostname:', hostname);
-        console.log('Is Local:', isLocal);
-        console.log('Is Vercel:', isVercel);
-        console.log('Origin:', window.location.origin);
+        console.log('Protocol:', protocol);
+        console.log('Origin:', origin);
         
         let baseUrl;
-        if (isLocal) {
+        
+        // Solo usar localhost si REALMENTE estamos en localhost
+        if (hostname === 'localhost' && protocol === 'http:') {
             baseUrl = 'http://localhost:5000/api';
-            console.log('✅ Using localhost API');
+            console.log('🏠 Localhost detected - using local API');
         } else {
-            baseUrl = `${window.location.origin}/api`;
-            console.log('✅ Using production API');
+            // CUALQUIER otro dominio (incluyendo Vercel) usa producción
+            baseUrl = `${origin}/api`;
+            console.log('🌐 Production detected - using:', baseUrl);
         }
         
         console.log('Final API URL:', baseUrl);
@@ -26,7 +28,7 @@ const API_CONFIG = {
         
         return baseUrl;
     })(),
-    TIMEOUT: 10000,
+    TIMEOUT: 15000,
     HEADERS: {
         'Content-Type': 'application/json'
     }
