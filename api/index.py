@@ -1,111 +1,67 @@
-from flask import Flask, jsonify, send_from_directory, send_file
-from flask_cors import CORS
+"""
+API para Red Social UCC - Vercel Deployment
+"""
+
+from flask import Flask, jsonify
 import os
 import sys
+
+# Añadir el directorio padre al path para importaciones
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def create_app(config_name=None):
-    """Factory para crear la aplicación Flask"""
-    app = Flask(__name__)
-    
-    # Configuración según el entorno
-    if config_name:
-        app.config.from_object(config_name)
-    elif os.getenv('FLASK_ENV') == 'production':
-        from prod_config import ProductionConfig
-        app.config.from_object(ProductionConfig)
-    else:
-        from config import Config
-        app.config.from_object(Config)
+# Configurar Flask app
+app = Flask(__name__)
 
-    # Habilitar CORS
-    CORS(app, origins=app.config.get('CORS_ORIGINS', ['http://localhost:3000', 'http://localhost:5000']))
-    
-    # Importar blueprints
+# Configuración básica
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'ucc-secret-key-2024')
+app.config['MONGO_URI'] = os.getenv('MONGO_URI', 'mongodb+srv://santiagoveloza91_db_user:Santi2025ucc@cluster0.l7jtdmh.mongodb.net/?appName=Cluster0')
+
+# CORS manual para evitar problemas
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
+# Health check básico
+@app.route('/')
+@app.route('/health')
+def health_check():
+    """Endpoint básico de salud"""
+    return jsonify({
+        "status": "OK",
+        "message": "UCC Red Social API funcionando",
+        "version": "1.0"
+    })
+
+# Importar y registrar blueprints solo si existen
+try:
     from routes.usuarios import usuarios_bp
     from routes.publicaciones import publicaciones_bp
     
-    # Registro de Blueprints (rutas)
-    app.register_blueprint(usuarios_bp, url_prefix='/api')
-    app.register_blueprint(publicaciones_bp, url_prefix='/api')
+    app.register_blueprint(usuarios_bp)
+    app.register_blueprint(publicaciones_bp)
     
-    return app
+    print("✅ Blueprints registrados correctamente")
+except ImportError as e:
+    print(f"⚠️ Error importando blueprints: {e}")
 
-# Crear aplicación para Vercel (producción)
-from prod_config import ProductionConfig
-app = create_app(ProductionConfig)
-
-# Los blueprints se registran dentro de create_app()
-
-# -----------------------------
-#  Rutas del Frontend
-# -----------------------------
-@app.route("/")
-def frontend():
-    """Servir el frontend"""
-    return send_file('frontend/index.html')
-
-@app.route("/css/<path:filename>")
-def serve_css(filename):
-    """Servir archivos CSS"""
-    return send_from_directory('frontend/css', filename)
-
-@app.route("/js/<path:filename>")
-def serve_js(filename):
-    """Servir archivos JavaScript"""
-    return send_from_directory('frontend/js', filename)
-
-@app.route("/images/<path:filename>")
-def serve_images(filename):
-    """Servir imágenes"""
-    return send_from_directory('frontend/images', filename)
-
-@app.route("/frontend/<path:filename>")
-def frontend_static(filename):
-    """Servir archivos estáticos del frontend"""
-    return send_from_directory('frontend', filename)
-
-# -----------------------------
-#  Ruta de información de la API
-# -----------------------------
-@app.route("/api")
+# Ruta de información de la API
+@app.route('/info')
 def api_info():
     return jsonify({
-        "mensaje": "Bienvenido a la API de Red Social Universitaria",
-        "version": "1.0",
+        "name": "Red Social UCC",
+        "university": "Universidad Cooperativa de Colombia",
         "endpoints": {
-            "usuarios": "/api/usuarios",
-            "publicaciones": "/api/publicaciones",
-            "health": "/api/health",
-            "frontend": "/"
+            "health": "/health",
+            "usuarios": "/usuarios", 
+            "publicaciones": "/publicaciones"
         }
     })
 
-@app.route("/api/health")
-def health_check():
-    """Endpoint para verificar que la API está funcionando"""
-    return jsonify({
-        "status": "OK",
-        "mensaje": "API funcionando correctamente"
-    })
-
-# -----------------------------
-#  Iniciar el servidor
-# -----------------------------
-if __name__ == "__main__":
-    print("🚀 Iniciando Red Social Universitaria...")
-    print("📍 Frontend disponible en: http://localhost:5000")
-    print("📡 API disponible en: http://localhost:5000/api")
-    print("🩺 Health check: http://localhost:5000/api/health")
-    
-    # Configuración más estable para Windows
-    app.run(
-        debug=app.config.get('DEBUG', True),
-        host='127.0.0.1',  # Solo localhost para evitar problemas de red
-        port=5000,
-        use_reloader=True,  # Activar reloader explícitamente
-        threaded=True       # Usar threading para mejor rendimiento
-    )
-
 # Para Vercel - exportar la aplicación
 application = app
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
