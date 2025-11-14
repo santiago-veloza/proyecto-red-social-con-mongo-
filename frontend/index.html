@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC - Universidad Cooperativa de Colombia</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>UCC</span>
+                </div>
+                <div class="nav-menu" id="nav-menu">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#home" class="nav-link active" onclick="navigateTo('home'); return false;">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#profile" class="nav-link" onclick="navigateTo('profile'); return false;">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#friends" class="nav-link">Amigos</a>
+                        </li>
+                        <li class="nav-item">
+                            <button class="btn btn-logout" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Salir
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav-toggle" id="nav-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Login/Register Section -->
+        <section id="auth-section" class="auth-section">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" onclick="switchTab('login')">Iniciar Sesión</button>
+                    <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="login-form" class="auth-form active">
+                    <h2><i class="fas fa-user"></i> Iniciar Sesión</h2>
+                    <form onsubmit="login(event)">
+                        <div class="form-group">
+                            <label for="login-email">Email Universitario:</label>
+                            <input type="email" id="login-email" required placeholder="tu.email@ucc.edu.co">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Contraseña:</label>
+                            <input type="password" id="login-password" required placeholder="Tu contraseña">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register-form" class="auth-form">
+                    <h2><i class="fas fa-user-plus"></i> Crear Cuenta</h2>
+                    <form onsubmit="register(event)">
+                        <div class="form-group">
+                            <label for="register-name">Nombre Completo:</label>
+                            <input type="text" id="register-name" required placeholder="Tu nombre completo">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email Universitario:</label>
+                            <input type="email" id="register-email" required placeholder="tu.email@ucc.edu.co">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Contraseña:</label>
+                            <input type="password" id="register-password" required placeholder="Mínimo 6 caracteres">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-university">Universidad:</label>
+                            <input type="text" id="register-university" value="Universidad Cooperativa de Colombia" readonly class="readonly-field">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-career">Carrera:</label>
+                            <input type="text" id="register-career" placeholder="Tu carrera universitaria">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-interests">¿Qué te interesa más? (Selecciona múltiples):</label>
+                            <div class="interests-container">
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" value="general" name="interests">
+                                    <span class="checkmark">📝 General</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" value="academico" name="interests">
+                                    <span class="checkmark">📚 Académico</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" value="eventos" name="interests">
+                                    <span class="checkmark">🎉 Eventos</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" value="ayuda" name="interests">
+                                    <span class="checkmark">🆘 Ayuda</span>
+                                </label>
+                                <label class="interest-checkbox">
+                                    <input type="checkbox" value="social" name="interests">
+                                    <span class="checkmark">👥 Social</span>
+                                </label>
+                            </div>
+                            <small class="interest-hint">Esto nos ayudará a mostrarte contenido más relevante</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Crear Cuenta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile-section" class="profile-section hidden">
+            <div class="container">
+                <div class="profile-header">
+                    <div class="profile-avatar-large">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="profile-details">
+                        <h1 id="profile-user-name">Nombre Usuario</h1>
+                        <p id="profile-user-career">Carrera • Universidad</p>
+                        <p id="profile-user-joined">Miembro desde</p>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-number" id="profile-posts-count">0</span>
+                                <span class="stat-label">Publicaciones</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="profile-likes-count">0</span>
+                                <span class="stat-label">Me gustas</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number" id="profile-category-count">0</span>
+                                <span class="stat-label">Categorías</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-interests">
+                        <h3><i class="fas fa-heart"></i> Mis Intereses</h3>
+                        <div id="profile-interests-badges">
+                            <!-- Interests badges will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="profile-favorite-category">
+                        <h3><i class="fas fa-star"></i> Categoría Favorita</h3>
+                        <div id="profile-favorite-category-badge">
+                            <!-- Favorite category will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="profile-recent-posts">
+                        <h3><i class="fas fa-clock"></i> Publicaciones Recientes</h3>
+                        <div id="profile-posts-container">
+                            <!-- Recent posts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="dashboard-section hidden">
+            <div class="container">
+                <!-- User Info -->
+                <div class="user-welcome">
+                    <div class="welcome-text">
+                        <h1>¡Hola, <span id="user-name">Usuario</span>!</h1>
+                        <p>Bienvenido a la red social de la Universidad Cooperativa de Colombia</p>
+                    </div>
+                    <div class="user-stats">
+                        <div class="stat">
+                            <span class="stat-number" id="posts-count">0</span>
+                            <span class="stat-label">Publicaciones</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number" id="friends-count">0</span>
+                            <span class="stat-label">Amigos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Create Post -->
+                    <div class="create-post">
+                        <h3><i class="fas fa-edit"></i> Crear Nueva Publicación</h3>
+                        <form onsubmit="createPost(event)">
+                            <div class="form-group">
+                                <input type="text" id="post-title" placeholder="Título de tu publicación (opcional)" class="post-title-input">
+                            </div>
+                            <div class="form-group">
+                                <textarea id="post-content" placeholder="Comparte algo interesante con tus compañeros de la UCC..." rows="4"></textarea>
+                            </div>
+                            <div class="post-options">
+                                <select id="post-category">
+                                    <option value="general">📝 General</option>
+                                    <option value="academico">📚 Académico</option>
+                                    <option value="eventos">🎉 Eventos</option>
+                                    <option value="ayuda">🆘 Ayuda</option>
+                                    <option value="social">👥 Social</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Publicar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Posts Feed -->
+                    <div class="posts-feed">
+                        <div class="feed-header">
+                            <h3><i class="fas fa-stream"></i> Publicaciones</h3>
+                            <div class="feed-controls">
+                                <div class="filter-group">
+                                    <button class="btn btn-filter active" id="btn-personalized" onclick="toggleFeedType('personalized')">
+                                        <i class="fas fa-star"></i> Para Ti
+                                    </button>
+                                    <button class="btn btn-filter" id="btn-all" onclick="toggleFeedType('all')">
+                                        <i class="fas fa-globe"></i> Todas
+                                    </button>
+                                </div>
+                                <div class="sort-group">
+                                    <button class="btn btn-sort active" id="btn-sort-popular" onclick="toggleSortType('popular')">
+                                        <i class="fas fa-fire"></i> Popular
+                                    </button>
+                                    <button class="btn btn-sort" id="btn-sort-recent" onclick="toggleSortType('recent')">
+                                        <i class="fas fa-clock"></i> Reciente
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="posts-container">
+                            <!-- Posts will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="sidebar">
+                        <!-- User Profile Card -->
+                        <div class="profile-card">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="profile-info">
+                                <h4 id="profile-name">Usuario</h4>
+                                <p id="profile-career">Carrera</p>
+                                <p id="profile-university">Universidad</p>
+                                <div class="profile-interests">
+                                    <h5>Mis Intereses:</h5>
+                                    <div id="profile-interests-list">
+                                        <!-- Interests will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Online Users -->
+                        <div class="online-users">
+                            <h4><i class="fas fa-users"></i> Usuarios Conectados</h4>
+                            <div id="online-users-list">
+                                <!-- Online users will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="quick-stats">
+                            <h4><i class="fas fa-chart-bar"></i> Estadísticas</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-icon"><i class="fas fa-users"></i></span>
+                                    <div>
+                                        <span class="stat-value" id="total-users">0</span>
+                                        <span class="stat-label">Total Usuarios</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon"><i class="fas fa-comments"></i></span>
+                                    <div>
+                                        <span class="stat-value" id="total-posts">0</span>
+                                        <span class="stat-label">Total Posts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner hidden">
+        <div class="spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/posts.js"></script>
+    <script src="/js/profile.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
