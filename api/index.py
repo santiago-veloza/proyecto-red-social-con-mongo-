@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def create_app(config_name=None):
     """Factory para crear la aplicación Flask"""
@@ -29,8 +31,9 @@ def create_app(config_name=None):
     
     return app
 
-# Crear aplicación para desarrollo
-app = create_app()
+# Crear aplicación para Vercel (producción)
+from prod_config import ProductionConfig
+app = create_app(ProductionConfig)
 
 # Los blueprints se registran dentro de create_app()
 
@@ -103,3 +106,6 @@ if __name__ == "__main__":
         use_reloader=True,  # Activar reloader explícitamente
         threaded=True       # Usar threading para mejor rendimiento
     )
+
+# Para Vercel - exportar la aplicación
+application = app
