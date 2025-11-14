@@ -40,7 +40,12 @@ class App {
         const isHealthy = await ApiUtils.checkHealth();
         
         if (!isHealthy) {
-            throw new Error('No se puede conectar con el servidor. Verifica que esté ejecutándose en http://localhost:5000');
+            const isProduction = !window.location.hostname.includes('localhost');
+            const errorMessage = isProduction 
+                ? 'No se puede conectar con el servidor. Por favor, inténtalo más tarde.'
+                : 'No se puede conectar con el servidor. Verifica que esté ejecutándose en http://localhost:5000';
+            
+            throw new Error(errorMessage);
         }
         
         console.log('✅ Conexión con API establecida');
@@ -225,8 +230,17 @@ class App {
 
     // Mostrar ayuda
     showHelp() {
-        const helpMessage = `
-            Para solucionar este problema:
+        const isProduction = !window.location.hostname.includes('localhost');
+        
+        const helpMessage = isProduction 
+            ? `Para solucionar este problema:
+            
+            1. Verifica tu conexión a internet
+            2. El servidor está siendo configurado, inténtalo en unos minutos
+            3. Contacta al administrador si el problema persiste
+            
+            URL de la API: ${API_CONFIG.BASE_URL}`
+            : `Para solucionar este problema:
             
             1. Verifica que el servidor esté ejecutándose:
                python app.py
@@ -236,10 +250,22 @@ class App {
             
             3. Verifica tu conexión a internet
             
-            4. Refresca la página
-        `;
+            4. Refresca la página`;
         
         alert(helpMessage);
+    }
+
+    // Debug de la API (útil para desarrollo)
+    debugAPI() {
+        console.log('=== APP DEBUG INFO ===');
+        console.log('App initialized:', this.isInitialized);
+        console.log('Retry count:', this.retryCount);
+        
+        if (typeof ApiUtils !== 'undefined') {
+            ApiUtils.debugApiConfig();
+        }
+        
+        console.log('======================');
     }
 
     // Recargar datos
@@ -361,3 +387,13 @@ window.toggleFeedType = toggleFeedType;
 window.toggleSortType = toggleSortType;
 window.showProfile = showProfile;
 window.debugProfile = debugProfile;
+
+// Funciones de debug globales
+window.debugAPI = () => {
+    if (window.app) {
+        window.app.debugAPI();
+    }
+    if (typeof ApiUtils !== 'undefined') {
+        ApiUtils.debugApiConfig();
+    }
+};
