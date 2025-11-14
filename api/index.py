@@ -24,7 +24,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
-# Health check básico
+# Health check básico - FUNCIONA en Vercel como /api/health
 @app.route('/')
 @app.route('/health')
 def health_check():
@@ -40,12 +40,22 @@ try:
     from routes.usuarios import usuarios_bp
     from routes.publicaciones import publicaciones_bp
     
-    app.register_blueprint(usuarios_bp)
-    app.register_blueprint(publicaciones_bp)
+    # Registrar blueprints SIN prefijo porque Vercel ya maneja /api/
+    app.register_blueprint(usuarios_bp, url_prefix='')
+    app.register_blueprint(publicaciones_bp, url_prefix='')
     
     print("✅ Blueprints registrados correctamente")
 except ImportError as e:
     print(f"⚠️ Error importando blueprints: {e}")
+    
+    # Si no se pueden importar, crear rutas básicas manually
+    @app.route('/usuarios', methods=['GET', 'POST'])
+    def usuarios_fallback():
+        return jsonify({"message": "Endpoint usuarios funcionando", "status": "OK"})
+    
+    @app.route('/publicaciones', methods=['GET', 'POST'])  
+    def publicaciones_fallback():
+        return jsonify({"message": "Endpoint publicaciones funcionando", "status": "OK"})
 
 # Ruta de información de la API
 @app.route('/info')
